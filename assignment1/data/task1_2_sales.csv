@@ -1,0 +1,17 @@
+Region,Product,Size,Business Model,Sales
+EU,Jeans,32,Online,5
+EU,Jeans,32,Store,15
+EU,Jeans,34,Online,2
+EU,Jeans,34,Store,10
+EU,Shirt,S,Online,2
+EU,Shirt,S,Store,10
+EU,Shirt,M,Online,2
+EU,Shirt,M,Store,5
+US,Jeans,32,Online,5
+US,Jeans,32,Store,2
+US,Jeans,34,Online,15
+US,Jeans,34,Store,5
+US,Shirt,S,Online,5
+US,Shirt,S,Store,2
+US,Shirt,M,Online,10
+US,Shirt,M,Store,5
