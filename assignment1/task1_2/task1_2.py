@@ -254,14 +254,211 @@ def create_parallel_coordinates():
     print(f"Saved parallel coordinates plot to {fig_path}")
 
 def create_dimensional_stacking(df):
-    """Create a Dimensional Stacking visualization and save it to task1_2/figures/dimensional_stacking.png
+    """Create a Dimensional Stacking visualization.
 
-    TODO: Implement a dimensional stacking visualization. There are multiple ways to approximate this with matplotlib.
+    Dimensions:
+        x outer: Region
+        x inner: Product
+        y outer: Business Model
+        y inner: Size
+
+    Color represents Sales.
+
+    Saves to task1_2/figures/dimensional_stacking.png
     """
-    ensure_fig_dir()
-    # TODO: implement the dimensional stacking plot
-    print("TODO: create_dimensional_stacking() — implement and save to figures/")
 
+    ensure_fig_dir()
+
+    regions = ["EU", "US"]
+    products = ["Jeans", "Shirt"]
+    business_models = ["Online", "Store"]
+
+    # Sizes depend on the product
+    product_sizes = {
+        "Jeans": [32, 34],
+        "Shirt": ["S", "M"]
+    }
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # Track positions so we can label the cells
+    cell_values = []
+
+    for region_index, region in enumerate(regions):
+        for product_index, product in enumerate(products):
+
+            # Nested x-position:
+            # Region is outer dimension, Product is inner dimension
+            x = region_index * len(products) + product_index
+
+            sizes = product_sizes[product]
+
+            for business_index, business in enumerate(business_models):
+                for size_index, size in enumerate(sizes):
+
+                    # Nested y-position:
+                    # Business Model is outer dimension, Size is inner dimension
+                    y = business_index * 2 + size_index
+
+                    row = df[
+                        (df["Region"] == region)
+                        & (df["Product"] == product)
+                        & (df["Size"] == size)
+                        & (df["Business Model"] == business)
+                    ]
+
+                    if not row.empty:
+                        sales = row["Sales"].iloc[0]
+
+                        cell_values.append(
+                            {
+                                "x": x,
+                                "y": y,
+                                "sales": sales,
+                                "region": region,
+                                "product": product,
+                                "business": business,
+                                "size": size
+                            }
+                        )
+
+    # Draw each cell
+    for cell in cell_values:
+        rectangle = plt.Rectangle(
+            (cell["x"], cell["y"]),
+            1,
+            1,
+            edgecolor="black",
+            linewidth=1
+        )
+
+        ax.add_patch(rectangle)
+
+        # Add sales number in the middle
+        ax.text(
+            cell["x"] + 0.5,
+            cell["y"] + 0.5,
+            str(cell["sales"]),
+            ha="center",
+            va="center",
+            fontsize=11
+        )
+
+    # Use an invisible scatter plot to create the color scale
+    scatter = ax.scatter(
+        [c["x"] + 0.5 for c in cell_values],
+        [c["y"] + 0.5 for c in cell_values],
+        c=[c["sales"] for c in cell_values],
+        s=900,
+        marker="s"
+    )
+
+    # Re-add text on top of colored squares
+    for cell in cell_values:
+        ax.text(
+            cell["x"] + 0.5,
+            cell["y"] + 0.5,
+            f'{cell["size"]}\n{cell["sales"]}',
+            ha="center",
+            va="center"
+        )
+
+    # -----------------------
+    # Axis labels
+    # -----------------------
+
+    ax.set_xlim(0, 4)
+    ax.set_ylim(0, 4)
+
+    ax.set_xticks([
+        0.5, 1.5,
+        2.5, 3.5
+    ])
+
+    ax.set_xticklabels([
+        "Jeans",
+        "Shirt",
+        "Jeans",
+        "Shirt"
+    ])
+
+    ax.set_yticks([
+        0.5, 1.5,
+        2.5, 3.5
+    ])
+
+    ax.set_yticklabels([
+        "Size 1",
+        "Size 2",
+        "Size 1",
+        "Size 2"
+    ])
+
+    # Outer dimension separators
+    ax.axvline(2, linewidth=2)
+    ax.axhline(2, linewidth=2)
+
+    # Outer Region labels
+    ax.text(
+        1,
+        -0.55,
+        "EU",
+        ha="center",
+        fontsize=12,
+        fontweight="bold"
+    )
+
+    ax.text(
+        3,
+        -0.55,
+        "US",
+        ha="center",
+        fontsize=12,
+        fontweight="bold"
+    )
+
+    # Outer Business Model labels
+    ax.text(
+        -0.6,
+        1,
+        "Online",
+        va="center",
+        rotation=90,
+        fontsize=12,
+        fontweight="bold"
+    )
+
+    ax.text(
+        -0.6,
+        3,
+        "Store",
+        va="center",
+        rotation=90,
+        fontsize=12,
+        fontweight="bold"
+    )
+
+    ax.set_title("Dimensional Stacking of Company Sales")
+
+    cbar = fig.colorbar(scatter, ax=ax)
+    cbar.set_label("Sales (1000 €)")
+
+    fig.tight_layout()
+
+    fig_path = os.path.join(
+        FIG_DIR,
+        "dimensional_stacking.png"
+    )
+
+    fig.savefig(
+        fig_path,
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+    plt.close(fig)
+
+    print(f"Saved dimensional stacking visualization to {fig_path}")
 
 def main():
     print("Task 1.2 starter script — reading CSV and printing DataFrame")
@@ -277,7 +474,7 @@ def main():
     identify_variable_types(df)
     # Once plotting functions are implemented, call them here:
     # create_parallel_coordinates(df)
-    # create_dimensional_stacking(df)
+    create_dimensional_stacking(df)
 
 
 if __name__ == "__main__":

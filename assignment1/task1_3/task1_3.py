@@ -1,59 +1,95 @@
-"""Starter script for Task 1.3 — placeholder code for fixing two visualizations.
+import pandas as pd
+import matplotlib.pyplot as plt
 
-This script provides helper functions and instructions. Add the original CSVs and images to assignment1/data/task1_3/ and
-implement the fix_visualization_1 and fix_visualization_2 functions to load the originals, analyze problems, and create improved plots.
-"""
+data = {
+    "State": [
+        "Iowa", "New Hampshire", "South Carolina", "Nevada",
+        "Alabama", "Alaska", "Arkansas", "Colorado", "Georgia",
+        "Massachusetts", "Minnesota", "North Dakota", "Oklahoma",
+        "Tennessee", "Texas", "Vermont", "Virginia",
+        "Kansas", "Kentucky", "Louisiana", "Maine",
+        "American Samoa", "Hawaii", "Idaho", "Michigan", "Mississippi",
+        "Guam", "Virgin Islands", "Puerto Rico",
+        "Florida", "Illinois", "Missouri", "North Carolina",
+        "Northern Marianas", "Ohio", "Arizona", "Utah",
+        "Wisconsin", "New York", "Connecticut", "Delaware",
+        "Maryland", "Pennsylvania", "Rhode Island",
+        "Indiana", "Nebraska", "West Virginia", "Oregon", "Washington",
+        "California", "Montana", "New Jersey", "New Mexico",
+        "South Dakota", "District of Columbia"
+    ],
 
-import os
-import glob
+    "Date": [
+        "2026-02-01", "2026-02-09", "2026-02-20", "2026-02-23",
+        "2026-03-01", "2026-03-01", "2026-03-01", "2026-03-01", "2026-03-01",
+        "2026-03-01", "2026-03-01", "2026-03-01", "2026-03-01",
+        "2026-03-01", "2026-03-01", "2026-03-01", "2026-03-01",
+        "2026-03-05", "2026-03-05", "2026-03-05", "2026-03-05",
+        "2026-03-08", "2026-03-08", "2026-03-08", "2026-03-08", "2026-03-08",
+        "2026-03-12", "2026-03-12", "2026-03-13",
+        "2026-03-15", "2026-03-15", "2026-03-15", "2026-03-15",
+        "2026-03-15", "2026-03-15", "2026-03-22", "2026-03-22",
+        "2026-04-05", "2026-04-19", "2026-04-26", "2026-04-26",
+        "2026-04-26", "2026-04-26", "2026-04-26",
+        "2026-05-03", "2026-05-10", "2026-05-10", "2026-05-17", "2026-05-24",
+        "2026-06-07", "2026-06-07", "2026-06-07", "2026-06-07",
+        "2026-06-07", "2026-06-14"
+    ]
+}
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "task1_3")
-FIG_DIR = os.path.join(os.path.dirname(__file__), "figures")
+df = pd.DataFrame(data)
 
+# Convert to real dates
+df["Date"] = pd.to_datetime(df["Date"])
 
-def ensure_fig_dir():
-    os.makedirs(FIG_DIR, exist_ok=True)
+# Sort by date
+df = df.sort_values("Date").reset_index(drop=True)
 
+import matplotlib.dates as mdates
 
-def list_available_originals():
-    """List CSV and image files placed in the data/task1_3 directory."""
-    print("Looking for original files in:", DATA_DIR)
-    patterns = ("*.csv", "*.png", "*.jpg", "*.jpeg")
-    found = []
-    for p in patterns:
-        found.extend(glob.glob(os.path.join(DATA_DIR, p)))
-    if not found:
-        print("No original CSVs or images found. Add files to assignment1/data/task1_3/")
-    else:
-        for f in found:
-            print("  ", os.path.relpath(f))
+plt.figure(figsize=(12, 14))
 
+month_colors = {
+    2: "tab:blue",
+    3: "tab:orange",
+    4: "tab:green",
+    5: "tab:red",
+    6: "tab:purple"
+}
 
-def fix_visualization_1(orig_csv_path):
-    """Placeholder for implementing fixes to the first chosen visualization.
+colors = df["Date"].dt.month.map(month_colors)
 
-    Steps to implement:
-    1. Load CSV using pandas.
-    2. Identify problems (expressiveness, effectiveness, appropriateness).
-    3. Create improved figure using matplotlib and save to task1_3/figures/improved_viz_1.png
-    """
-    ensure_fig_dir()
-    # TODO: implement
-    print("TODO: fix_visualization_1() — implement when you select the first visualization to fix.")
-
-
-def fix_visualization_2(orig_csv_path):
-    """Placeholder for implementing fixes to the second chosen visualization."""
-    ensure_fig_dir()
-    # TODO: implement
-    print("TODO: fix_visualization_2() — implement when you select the second visualization to fix.")
+plt.scatter(df["Date"], df["State"], c=colors, s=50)
 
 
-def main():
-    print("Task 1.3 starter script")
-    list_available_originals()
-    print("Place original CSVs and images in assignment1/data/task1_3/ and then implement fix_visualization_1/2().")
 
+plt.xlabel("Date")
+plt.ylabel("State")
+plt.title("Dates by State")
 
-if __name__ == "__main__":
-    main()
+ax = plt.gca()
+import matplotlib.dates as mdates
+
+ax = plt.gca()
+
+# Major tick on the 1st of every month
+ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=1))
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%b 1"))
+
+# Minor tick for every day
+ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
+
+# Major ticks larger, daily ticks smaller
+ax.tick_params(axis="x", which="major", length=8)
+ax.tick_params(axis="x", which="minor", length=3)
+
+plt.xticks(rotation=45)
+
+# Display dates as e.g. "Feb 01", "Mar 01", etc.
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
+
+plt.xticks(rotation=45)
+plt.grid(axis="x", alpha=0.3)
+
+plt.tight_layout()
+plt.show()
